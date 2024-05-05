@@ -60,11 +60,5 @@ class TestMenu(unittest.TestCase):
         for obj in menu_list:
             assert len(menu.title_menu.center(menu.left + menu.right, '*')) == len(obj)
 
-
-
-
-
-
-
 if __name__ == "__main__":
     unittest.main()
