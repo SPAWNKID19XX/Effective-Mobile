@@ -73,6 +73,7 @@ class Record:
 def csv_open(new_rec = None):
     if not os.path.exists(CSV_DIR):
         #todo when csv file is created, first rec is ignored. solve it
+        #todo try to put creation of csv in main script
         with open(CSV_DIR, 'w',newline="") as file:
             writer = csv.writer(file)
             writer.writerow(['creation_date', 'updated_date', 'category', 'amount', 'description'])
@@ -88,10 +89,10 @@ def csv_open(new_rec = None):
 
 def add_rec(category):
     if category == '2':
-        category = Record.Category.expense[0]
+        category = Record.Category.expense[1]
 
     elif category == '4':
-        category = Record.Category.income[0]
+        category = Record.Category.income[1]
 
     amount = input('Insert amount: ')
     description =  input('Insert short description: ')
@@ -101,35 +102,40 @@ def add_rec(category):
 
 def get_balance():
     balance = 0.00
-    with open(CSV_DIR) as file:
-        reader = csv.DictReader(file)
-        for obj in reader:
-            if obj['category'] == 'income':
-                balance += float(obj['amount'])
-            else:
-                balance -= float(obj['amount'])
+    try:
+        with open(CSV_DIR) as file:
+            reader = csv.DictReader(file)
+            for obj in reader:
+                if obj['category'] == 'income':
+                    balance += float(obj['amount'])
+                else:
+                    balance -= float(obj['amount'])
+    except:
+        print('file csv does not exist yet')
     return balance
 
 def get_list(category=None, search_list = []):
-    with open(CSV_DIR) as file:
-        reader = csv.DictReader(file)
-        print('\033[94m'+'creation_date'.ljust(26), 'updated_date'.ljust(33), 'category'.rjust(0),
-              'amount'.rjust(15), 'description'.rjust(15),"\033[0m" )
+    try:
+        with open(CSV_DIR) as file:
+            reader = csv.DictReader(file)
+            print('\033[94m'+'creation_date'.ljust(26), 'updated_date'.ljust(33), 'category'.rjust(0),
+                  'amount'.rjust(15), 'description'.rjust(15),"\033[0m" )
 
-        if not search_list:
-            if not category:
-                for row in reader:
-                    print(row['creation_date'].rjust(25), row['updated_date'].rjust(25), row['category'].rjust(15), row['amount'].rjust(15),row['description'].rjust(15))
-            else:
-                for row in reader:
-                    if row['category'] == category:
+            if not search_list:
+                if not category:
+                    for row in reader:
                         print(row['creation_date'].rjust(25), row['updated_date'].rjust(25), row['category'].rjust(15), row['amount'].rjust(15),row['description'].rjust(15))
+                else:
+                    for row in reader:
+                        if row['category'] == category:
+                            print(row['creation_date'].rjust(25), row['updated_date'].rjust(25), row['category'].rjust(15), row['amount'].rjust(15),row['description'].rjust(15))
 
-        else:
-            for row in search_list:
-                print(row['creation_date'].rjust(25), row['updated_date'].rjust(25), row['category'].rjust(15),
-                  row['amount'].rjust(15), row['description'].rjust(15))
-
+            else:
+                for row in search_list:
+                    print(row['creation_date'].rjust(25), row['updated_date'].rjust(25), row['category'].rjust(15),
+                      row['amount'].rjust(15), row['description'].rjust(15))
+    except:
+        print('No records')
 
 def search_some_rec():
     res_list = []
@@ -159,11 +165,14 @@ while not menu_option.isdecimal() or menu_option != '0':
 
     if menu_option == '4':
         add_rec(menu_option)
+
     if menu_option == '5':
         get_list()
+
     if menu_option == '6':
         search_some_rec()
     if menu_option == '7':
         print(menu_option)
+
     if menu_option == '0':
         print(menu_option)
