@@ -2,6 +2,8 @@ import csv
 import os
 import unittest, datetime
 
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+CSV_DIR = os.path.join(CURRENT_DIR, 'db.csv')
 
 class Menu:
     def __init__(self, title_menu=None, left=None, right=None):
@@ -36,11 +38,23 @@ class Menu:
 
     def __str__(self):
         result = self.title_menu.center(self.left + self.right, '*') + '\n'
-        result += 'Balance'.ljust(self.left, ".") + 'float(balance)'.rjust(self.right, '.') + '\n'
+        result += 'Balance'.ljust(self.left, ".") + f'{get_balance():.2f}'.rjust(self.right, '.') + '\n'
         for k, v in self.menu_dict.items():
             result += k.ljust(self.left, ".") + v.rjust(self.right, '.') + '\n'
         return result
 
+
+def get_balance():
+    balance = 0.00
+    with open(CSV_DIR) as file:
+        reader = csv.DictReader(file)
+        for obj in reader:
+            print(obj['category'],obj['amount'])
+            if obj['category'] == 'income':
+                balance += float(obj['amount'])
+            else:
+                balance -= float(obj['amount'])
+    return balance
 
 class Record:
     '''
@@ -67,18 +81,14 @@ class Record:
         return f'{self.date} {self.date_updated} {self.category} {self.amount} {self.description}'
 
 def csv_open(new_rec = None):
-    print('------------------',new_rec)
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_dir = os.path.join(current_dir, 'db.csv')
-    print(csv_dir)
-    if not os.path.exists(csv_dir):
-        with open(csv_dir, 'w',newline="") as file:
+    if not os.path.exists(CSV_DIR):
+        with open(CSV_DIR, 'w',newline="") as file:
             writer = csv.writer(file)
             writer.writerow(['creation_date', 'updated_date', 'category', 'amount', 'description'])
         file.close()
-        print(f"CSV file '{csv_dir}' has been created successfully.")
+        print(f"CSV file '{CSV_DIR}' has been created successfully.")
     else:
-        csv_file = open(csv_dir, 'a')
+        csv_file = open(CSV_DIR, 'a')
         writer = csv.writer(csv_file)
         writer.writerow([str(new_rec.date), str(new_rec.date_updated), new_rec.category,new_rec.amount, new_rec.description])
 
@@ -106,7 +116,7 @@ while not menu_option.isdecimal() or menu_option != '0':
     print(menu.__str__())
     menu_option = input('Your option: ')
     if menu_option == '1':
-        print(menu_option)
+        get_balance()
 
     if menu_option == '2':
         add_rec(menu_option)
