@@ -1,6 +1,6 @@
 import csv
 import os
-import unittest, datetime
+import datetime
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_DIR = os.path.join(CURRENT_DIR, 'db.csv')
@@ -14,13 +14,13 @@ class Menu:
         :param left: at least 20
         :param right: at least 20
         :param menu_dict: {
-            '1': "Expanses",
-            '2': "Add Expanse",
+            '1': "Add Rec",
+            '2': "Expanses",
             '3': "Incomes",
-            '4': "Add Income",
-            '5': "Accounting list",
-            '6': 'Search',
-            '7': 'Edit'
+            '4': "View all list",
+            '5': "Search",
+            '6': "Edit",
+            '0': "Exit"
         }
         '''
         self.title_menu = title_menu if title_menu is not None else "My Accounting"
@@ -37,6 +37,10 @@ class Menu:
         }
 
     def __str__(self):
+        '''
+        printing all menu
+        :return:
+        '''
         result = self.title_menu.center(self.left + self.right, '*') + '\n'
         result += 'Balance'.ljust(self.left, ".") + f'{get_balance():.2f}'.rjust(self.right, '.') + '\n'
         for k, v in self.menu_dict.items():
@@ -86,10 +90,12 @@ class Record:
         return f'{self.date} {self.date_updated} {self.category} {self.amount} {self.description}'
 
 
-import os
-import csv
-
 def csv_open(new_rec):
+    '''
+    working with csv file(connection and add ew info)
+    :param new_rec: is class.Record
+    :return: None
+    '''
     if not os.path.exists(CSV_DIR):
         # Create the CSV file with header if it doesn't exist
         with open(CSV_DIR, 'w', newline="") as file:
@@ -99,14 +105,18 @@ def csv_open(new_rec):
     try:
         with open(CSV_DIR, 'a', newline="") as file:
             writer = csv.writer(file)
-            writer.writerow([str(new_rec.date), str(new_rec.date_updated), new_rec.category, new_rec.amount, new_rec.description])
+            writer.writerow(
+                [str(new_rec.date), str(new_rec.date_updated), new_rec.category, new_rec.amount, new_rec.description])
         print("New record has been added to the CSV file.")
     except (IOError, PermissionError) as e:
         print(f"Error occurred while writing to the CSV file: {e}")
 
 
-
 def add_rec():
+    '''
+    get all data to send to creating new movement
+    :return: None
+    '''
     record = Record()
     category = record.setter_category()
     amount = record.setter_amount()
@@ -115,8 +125,11 @@ def add_rec():
     csv_open(new_rec)
 
 
-
-def get_balance():
+def get_balance() -> float:
+    '''
+    calculate a balans using csv file
+    :return: float
+    '''
     balance = 0.00
     try:
         with open(CSV_DIR) as file:
@@ -127,11 +140,16 @@ def get_balance():
                 else:
                     balance -= float(obj['amount'])
     except:
-        print('file csv does not exist yet')
+        pass
     return balance
 
 
-def print_list(list=[]):
+def print_list(lst: list = []) -> None:
+    '''
+    print list
+    :param list:
+    :return:None
+    '''
     print("\033[91m" + 'id'.center(8), '\033[94m' + 'creation_date'.ljust(26), 'updated_date'.ljust(33),
           'category'.rjust(0),
           'amount'.rjust(15), 'description'.rjust(15), "\033[0m")
@@ -143,30 +161,41 @@ def print_list(list=[]):
 
 
 def get_list(category=None):
+    '''
+    search recs by category
+    :param category: class Record.Category
+    :return: None
+    '''
     res = []
-    with open(CSV_DIR) as file:
-        reader = csv.DictReader(file)
-        if not category:
-            for row in reader:
-                res.append(row)
-        else:
-            for i, row in enumerate(reader):
-                if row['category'] == category:
+    try:
+        with open(CSV_DIR) as file:
+            reader = csv.DictReader(file)
+            if not category:
+                for row in reader:
                     res.append(row)
-    print_list(res)
+            else:
+                for i, row in enumerate(reader):
+                    if row['category'] == category:
+                        res.append(row)
+        print_list(res)
+    except:
+        print("\033[91m" + 'Before to get list you should to create at least 1 movimente' + '\033[0m')
 
 
 def search_some_rec():
-    res_list = []
-    str_text = input('Insert category,create date or amount:')
-    with open(CSV_DIR) as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            for obj in row:
-                if str_text in row[obj] and row not in res_list:
-                    res_list.append(row)
-                    continue
-    print_list(res_list)
+    try:
+        res_list = []
+        with open(CSV_DIR) as file:
+            reader = csv.DictReader(file)
+            str_text = input('Insert category,create date or amount:')
+            for row in reader:
+                for obj in row:
+                    if str_text in row[obj] and row not in res_list:
+                        res_list.append(row)
+                        continue
+        print_list(res_list)
+    except:
+        print("\033[91m" + 'Before to get list you should to create at least 1 movimente' + '\033[0m')
 
 
 def edit_record():
@@ -174,47 +203,46 @@ def edit_record():
     edit_rec = None
     rows = []
 
-    # Read the CSV file and store its contents in memory
-    with open(CSV_DIR, 'r', newline='') as file:
-        reader = csv.reader(file)
-        header = next(reader)  # Read the header
-        for row in reader:
-            rows.append(row)
+    if not os.path.exists(CSV_DIR):
+        pass
+    else:
+        with open(CSV_DIR, 'r', newline='') as file:
+            reader = csv.reader(file)
+            header = next(reader)
+            for row in reader:
+                rows.append(row)
 
-    while True:
-        try:
-            edit_rec = int(input('ID to edit: '))
-            if 0 < edit_rec <= len(rows):
-                break  # Exit the loop if the input is valid
-            else:
-                print("Invalid ID. Please enter a valid ID.")
-        except ValueError:
-            print("Invalid input. Please enter an integer.")
+        while True:
+            try:
+                edit_rec = int(input('ID to edit: '))
+                if 0 < edit_rec <= len(rows):
+                    break  # Exit the loop if the input is valid
+                else:
+                    print("Invalid ID. Please enter a valid ID.")
+            except ValueError:
+                print("Invalid input. Please enter an integer.")
 
-    old_rec = rows[edit_rec - 1]
-    print(old_rec)
+        old_rec = rows[edit_rec - 1]
+        print(old_rec)
 
-    # Assuming Record class has appropriate methods for setting category, amount, and description
-    rec = Record()
-    category = rec.setter_category()
-    amount = rec.setter_amount()
-    description = rec.setter_description()
+        rec = Record()
+        category = rec.setter_category()
+        amount = rec.setter_amount()
+        description = rec.setter_description()
 
-    # Create a new record with the updated data
-    new_row = [
-        old_rec[0],  # Date (assuming it's not edited)
-        datetime.datetime.now(),  # Updated date
-        category,
-        amount,
-        description
-    ]
-    rows[edit_rec - 1] = new_row  # Replace the old row with the new one
+        new_row = [
+            old_rec[0],
+            datetime.datetime.now(),  # Updated date
+            category,
+            amount,
+            description
+        ]
+        rows[edit_rec - 1] = new_row
 
-    # Write the updated data back to the CSV file
-    with open(CSV_DIR, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(header)  # Write the header back
-        writer.writerows(rows)
+        with open(CSV_DIR, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(header)
+            writer.writerows(rows)
 
 
 menu_option = 'a'
