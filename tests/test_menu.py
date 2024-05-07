@@ -11,13 +11,12 @@ class TestMenu(unittest.TestCase):
 
     def test_menu_k_v(self):
         assert self.menu.menu_dict == {
-            '1': "Expanses",
-            '2': "Add Expanse",
+            '1': "Add Rec",
+            '2': "Expanses",
             '3': "Incomes",
-            '4': "Add Income",
-            '5': "Accounting list",
-            '6': "Search",
-            '7': "Edit",
+            '4': "View all list",
+            '5': "Search",
+            '6': "Edit",
             '0': "Exit"
         }
 
