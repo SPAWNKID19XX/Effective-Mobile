@@ -44,3 +44,70 @@ FastAPI, Flask и тд).
 Это задание направлено на проверку навыков работы с файлами, понимания основ
 программирования и способности к созданию структурированного и читаемого кода.
 Удачи в реализации!
+
+
+
+Program Name: Accounting System
+
+Description:
+This program serves as an accounting system to manage financial records. It allows users to perform various operations such as adding records, viewing records, searching for records, 
+and editing records.
+
+Features:
+1. Add Record: Allows users to add new financial records to the system.
+2. View Expenses: Displays a list of expense records.
+3. View Incomes: Displays a list of income records.
+4. View All Records: Displays a list of all financial records.
+5. Search Records: Allows users to search for records by category, creation date, or amount.
+6. Edit Records: Allows users to edit existing records.
+
+Program Components:
+1. Menu Class:
+   - Initializes a menu with options for different operations.
+   - Provides a formatted menu display.
+
+2. Record Class:
+   - Represents a financial record with attributes such as creation date, updated date, category, amount, and description.
+   - Provides methods to set category, amount, and description.
+   - Provides a string representation of the record.
+
+3. csv_open Function:
+   - Handles opening and writing to the CSV file that stores financial records.
+   - Creates the CSV file if it doesn't exist.
+   - Appends new records to the CSV file.
+
+4. add_rec Function:
+   - Prompts users to input data for a new financial record.
+   - Creates a new Record object with the input data.
+   - Calls csv_open to add the new record to the CSV file.
+
+5. get_balance Function:
+   - Calculates the balance by summing up income and subtracting expenses from the financial records stored in the CSV file.
+
+6. print_list Function:
+   - Prints a list of financial records in a formatted manner.
+
+7. get_list Function:
+   - Retrieves financial records from the CSV file based on the specified category.
+   - Calls print_list to display the retrieved records.
+
+8. search_some_rec Function:
+   - Allows users to search for financial records based on a given search string.
+   - Calls print_list to display the search results.
+
+9. edit_record Function:
+   - Allows users to edit existing financial records.
+   - Retrieves the record to be edited.
+   - Prompts users to input new data for the record.
+   - Updates the record with the new data and writes the updated records back to the CSV file.
+
+Usage:
+- Run the program and follow the menu prompts to perform different operations.
+- Input data as prompted to add, view, search, or edit financial records.
+- The program ensures proper formatting and error handling throughout the operations.
+- The financial records are stored in a CSV file ('db.csv') located in the same directory as the program. It created after add first rec
+
+Final Programm is in master branch
+
+Author: Boris Isac
+Date: 07-05-2024
