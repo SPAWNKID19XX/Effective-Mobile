@@ -107,5 +107,7 @@ Usage:
 - The program ensures proper formatting and error handling throughout the operations.
 - The financial records are stored in a CSV file ('db.csv') located in the same directory as the program. It created after add first rec
 
+Final Programm is in master branch
+
 Author: Boris Isac
 Date: 07-05-2024
